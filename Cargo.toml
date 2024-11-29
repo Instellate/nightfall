@@ -1,0 +1,17 @@
+[package]
+name = "nightfall"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+full = ["register"]
+register = ["dep:twilight-util"]
+
+[dependencies]
+async-trait = "0.1.83"
+deppy = { path = "./deppy" }
+snafu = "0.8.5"
+# tokio = { version = "1.41.1", features = ["full"] }
+twilight-http = "0.15.4"
+twilight-model = "0.15.4"
+twilight-util = { version = "0.15.4", features = ["builder"], optional = true }

@@ -1,0 +1,9 @@
+[package]
+name = "nightfall-example"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+nightfall = { path = "../", features = ["full"] }
+nightfall-macros = { path = "../macros" }
+twilight-model = "0.15.4"
