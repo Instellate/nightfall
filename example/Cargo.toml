@@ -5,8 +5,8 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.93"
-deppy = { path = "../deppy" }
-deppy-macros = { path = "../deppy/macros" }
+deppy = { git = "https://github.com/Instellate/deppy.git", rev = "bddbfcfd5fd4f4a1b3c524730c37664a6e986e51" }
+deppy-macros = { git = "https://github.com/Instellate/deppy.git", rev = "bddbfcfd5fd4f4a1b3c524730c37664a6e986e51", package = "deppy-macros" }
 nightfall = { path = "..", features = ["services"] }
 nightfall-macros = { path = "../macros" }
 serde = "1.0.215"
