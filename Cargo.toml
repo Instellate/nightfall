@@ -4,14 +4,19 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-full = ["register"]
-register = ["dep:twilight-util"]
+services = ["dep:twilight-cache-inmemory", "dep:twilight-http"]
+
+[workspace]
+members = [
+    "./macros",
+    "./example",
+]
 
 [dependencies]
 async-trait = "0.1.83"
 deppy = { path = "./deppy" }
 snafu = "0.8.5"
-# tokio = { version = "1.41.1", features = ["full"] }
-twilight-http = "0.15.4"
+twilight-cache-inmemory = { version = "0.15.4", optional = true }
+twilight-http = { version = "0.15.4", optional = true }
 twilight-model = "0.15.4"
-twilight-util = { version = "0.15.4", features = ["builder"], optional = true }
+twilight-util = { version = "0.15.4", features = ["builder"] }

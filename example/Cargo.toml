@@ -4,6 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-nightfall = { path = "../", features = ["full"] }
+anyhow = "1.0.93"
+deppy = { path = "../deppy" }
+deppy-macros = { path = "../deppy/macros" }
+nightfall = { path = "..", features = ["services"] }
 nightfall-macros = { path = "../macros" }
+serde = "1.0.215"
+serde_json = "1.0.133"
+tokio = { version = "1.41.1", features = ["full"] }
+twilight-cache-inmemory = "0.15.4"
+twilight-gateway = "0.15.4"
+twilight-http = "0.15.4"
 twilight-model = "0.15.4"
+twilight-util = { version = "0.15.4", features = ["builder"] }
+

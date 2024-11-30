@@ -1,0 +1,3 @@
+{
+    "rust-analyzer.linkedProjects": ["deppy/Cargo.toml", "example/Cargo.toml", "macros/Cargo.toml"]
+}

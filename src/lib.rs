@@ -1,20 +1,25 @@
 pub mod export;
+pub mod register;
+#[cfg(feature = "services")]
+pub mod services;
 
 use async_trait::async_trait;
 use deppy::ServiceHandler;
 use snafu::Snafu;
-use std::any::TypeId;
+use std::any::{Any, TypeId};
 use std::collections::HashMap;
 use std::error::Error as ErrorTrait;
-use twilight_model::application::command::CommandOptionType;
+use std::sync::Arc;
+use twilight_model::application::command::{Command, CommandOptionType};
 use twilight_model::application::interaction::application_command::{
     CommandData, CommandDataOption, CommandOptionValue,
 };
 use twilight_model::application::interaction::InteractionData;
 use twilight_model::gateway::payload::incoming::InteractionCreate;
-use twilight_model::id::marker::{AttachmentMarker, ChannelMarker, GenericMarker, RoleMarker};
+use twilight_model::id::marker::{
+    AttachmentMarker, ChannelMarker, GenericMarker, RoleMarker, UserMarker,
+};
 use twilight_model::id::Id;
-use twilight_util::builder::command::CommandBuilder;
 
 #[async_trait]
 pub trait CommandController {
@@ -24,15 +29,14 @@ pub trait CommandController {
         data: &CommandData,
     ) -> Result<(), Error>;
 
-    fn command_names() -> Vec<String>
+    fn get_command_names<'a>() -> &'a [&'static str]
     where
         Self: Sized,
     {
-        vec![]
+        &[]
     }
 
-    #[cfg(feature = "register")]
-    fn create_commands() -> Vec<CommandBuilder>
+    fn build_commands() -> Vec<Command>
     where
         Self: Sized,
     {
@@ -146,8 +150,14 @@ impl FromOption for Vec<CommandDataOption> {
     }
 }
 
-pub struct CommandHandler {
-    commands: HashMap<String, TypeId>,
+impl FromOption for Id<UserMarker> {
+    fn from_option(value: CommandOptionValue) -> Option<Self> {
+        if let CommandOptionValue::User(v) = value {
+            Some(v)
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug, Snafu)]
@@ -162,8 +172,34 @@ pub enum Error {
     CommandError { error: Box<dyn ErrorTrait> },
 }
 
-impl CommandHandler {
-    pub async fn handle_command_interaction<T: ServiceHandler>(
+type ConvertFn<T> = fn(&<T as ServiceHandler>::ScopeType) -> Arc<dyn CommandController + 'static>; 
+
+#[derive(Debug)]
+pub struct CommandHandler<T: ServiceHandler> {
+    commands: HashMap<String, ConvertFn<T>>,
+}
+
+impl<T: ServiceHandler> CommandHandler<T> {
+    pub fn new() -> Self {
+        CommandHandler {
+            commands: Default::default(),
+        }
+    }
+
+    pub fn add_command<C: CommandController + Any + Send + Sync>(mut self) -> Self {
+        for name in C::get_command_names() {
+            self.commands.insert(name.to_string(), |h: &T::ScopeType| {
+                h.get_service_by_type_id(&TypeId::of::<C>())
+                    .unwrap()
+                    .downcast::<C>()
+                    .unwrap() as Arc<dyn CommandController>
+            });
+        }
+
+        self
+    }
+
+    pub async fn handle_command_interaction(
         &self,
         interaction: &InteractionCreate,
         handler: &T,
@@ -173,23 +209,20 @@ impl CommandHandler {
             _ => return Err(Error::NotApplicationCommand),
         };
 
-        let type_id = match self.commands.get(&data.name) {
+        let fn_ = match self.commands.get(&data.name) {
             Some(t) => t,
             None => return Err(Error::CommandNotFound),
         };
 
         let scope = handler.create_scope();
-        let command_controller_arc = match scope.get_service_by_type_id(type_id) {
-            Some(c) => c,
-            None => return Err(Error::CommandNotFound),
-        };
-
-        let command_controller =
-            match command_controller_arc.downcast_ref::<&dyn CommandController>() {
-                Some(c) => c,
-                None => return Err(Error::CommandNotFound), // TODO: Make it into an error
-            };
+        let command_controller = fn_(&scope);
 
         command_controller.execute_command(interaction, data).await
+    }
+}
+
+impl<T: ServiceHandler> Default for CommandHandler<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }
