@@ -14,7 +14,7 @@ members = [
 
 [dependencies]
 async-trait = "0.1.83"
-deppy = { git = "https://github.com/Instellate/deppy.git", rev = "bddbfcfd5fd4f4a1b3c524730c37664a6e986e51" }
+deppy = { git = "https://github.com/Instellate/deppy.git", rev = "c2e8405119d69cd001d22beee70531ac130ea725" }
 snafu = "0.8.5"
 twilight-cache-inmemory = { version = "0.15.4", optional = true }
 twilight-http = { version = "0.15.4", optional = true }

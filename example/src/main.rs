@@ -119,7 +119,7 @@ impl TestSub {
             data: Some(data),
         };
 
-        let reponse = self
+        self
             .client
             .interaction(Id::new(813708786493161523))
             .create_response(interaction.id, &interaction.token, &response_msg)

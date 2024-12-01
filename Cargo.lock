@@ -252,12 +252,12 @@ dependencies = [
 [[package]]
 name = "deppy"
 version = "0.1.0"
-source = "git+https://github.com/Instellate/deppy.git?rev=bddbfcfd5fd4f4a1b3c524730c37664a6e986e51#bddbfcfd5fd4f4a1b3c524730c37664a6e986e51"
+source = "git+https://github.com/Instellate/deppy.git?rev=c2e8405119d69cd001d22beee70531ac130ea725#c2e8405119d69cd001d22beee70531ac130ea725"
 
 [[package]]
 name = "deppy-macros"
 version = "0.1.0"
-source = "git+https://github.com/Instellate/deppy.git?rev=bddbfcfd5fd4f4a1b3c524730c37664a6e986e51#bddbfcfd5fd4f4a1b3c524730c37664a6e986e51"
+source = "git+https://github.com/Instellate/deppy.git?rev=c2e8405119d69cd001d22beee70531ac130ea725#c2e8405119d69cd001d22beee70531ac130ea725"
 dependencies = [
  "darling",
  "proc-macro2",
